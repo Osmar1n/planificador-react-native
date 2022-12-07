@@ -11,3 +11,15 @@ export const generarId = () => {
 
     return random + fecha;
 };
+
+export const formatearFecha = fecha => {
+    const fechaNueva = new Date(fecha);
+
+    return fechaNueva.toLocaleDateString('es-GT', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+};
+
+export const delay = ms => new Promise(resolve => setTimeout(resolve, ms));

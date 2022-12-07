@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View, TextInput, Pressable, StyleSheet} from 'react-native';
+import {Text, View, TextInput, Pressable, StyleSheet, TouchableOpacity} from 'react-native';
 import globalStyles from '../styles';
 
 const NuevoPresupuesto = ({
@@ -19,11 +19,11 @@ const NuevoPresupuesto = ({
                 onChangeText={setPresupuesto}
             />
 
-            <Pressable
+            <TouchableOpacity
                 style={styles.boton}
                 onPress={() => handleNuevoPresupuesto(presupuesto)}>
                 <Text style={styles.botonTexto}>Agregar presupuesto</Text>
-            </Pressable>
+            </TouchableOpacity>
         </View>
     );
 };

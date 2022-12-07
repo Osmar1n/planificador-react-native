@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Text,
     SafeAreaView,
@@ -6,27 +6,55 @@ import {
     TextInput,
     StyleSheet,
     Pressable,
+    TouchableOpacity,
 } from 'react-native';
 import globalStyles from '../styles';
 import {Picker} from '@react-native-picker/picker';
 
-const FormularioGasto = ({setModal, handleGasto}) => {
+const FormularioGasto = ({setModal, handleGasto, gasto, setGasto, handleEliminarGasto}) => {
     const [nombre, setNombre] = useState('');
     const [cantidad, setCantidad] = useState('');
     const [categoria, setCategoria] = useState('');
+    const [id, setId] = useState('');
+    const [fecha, setFecha] = useState('');
+
+    useEffect(() => {
+        if (gasto?.id) {
+            setNombre(gasto.nombre);
+            setCantidad(gasto.cantidad);
+            setCategoria(gasto.categoria);
+            setId(gasto.id);
+            setFecha(gasto.fecha);
+        }
+    }, [gasto]);
 
     return (
         <SafeAreaView style={styles.contenedor}>
-            <View>
-                <Pressable
-                    style={styles.btnCancelar}
-                    onPressIn={() => setModal(false)}>
-                    <Text style={styles.btnCancelarTexto}>Cancelar</Text>
-                </Pressable>
+            <View style={styles.contenedorBotones}>
+                <TouchableOpacity
+                    style={[styles.btn, styles.btnCancelar]}
+                    onPress={() => {
+                        setModal(false);
+                        setGasto({});
+                    }}>
+                    <Text style={styles.btnTexto}>Cancelar</Text>
+                </TouchableOpacity>
+
+                {gasto?.id && (
+                    <TouchableOpacity
+                        style={[styles.btn, styles.btnEliminar]}
+                        onPress={() => {
+                            handleEliminarGasto(id);
+                        }}>
+                        <Text style={styles.btnTexto}>Eliminar</Text>
+                    </TouchableOpacity>
+                )}
             </View>
 
             <View style={styles.formulario}>
-                <Text style={styles.titulo}>Nuevo gasto</Text>
+                <Text style={styles.titulo}>
+                    {gasto?.id ? 'Editar gasto' : 'Nuevo gasto'}
+                </Text>
 
                 <View style={styles.campo}>
                     <Text style={styles.label}>Nombre Gasto</Text>
@@ -53,34 +81,48 @@ const FormularioGasto = ({setModal, handleGasto}) => {
 
                 <View style={styles.campo}>
                     <Text style={styles.label}>Categoría Gasto</Text>
-                    <Picker
-                        style={styles.input}
-                        selectedValue={categoria}
-                        onValueChange={itemValue => setCategoria(itemValue)}>
-                        <Picker.Item
-                            label="Seleccione..."
-                            value=""
-                            color="grey"
-                            enabled={false}
-                        />
-                        <Picker.Item label="Ahorro" value="ahorro" />
-                        <Picker.Item label="Comida" value="comida" />
-                        <Picker.Item label="Casa" value="casa" />
-                        <Picker.Item label="Gastos varios" value="gastos" />
-                        <Picker.Item label="Ocio" value="ocio" />
-                        <Picker.Item label="Salud" value="salud" />
-                        <Picker.Item
-                            label="Suscripciones"
-                            value="suscripciones"
-                        />
-                    </Picker>
+                    <View
+                        style={{
+                            borderRadius: 10,
+                            overflow: 'hidden',
+                            marginTop: 10,
+                        }}>
+                        <Picker
+                            style={{...styles.input, marginTop: 0}}
+                            dropdownIconColor="grey"
+                            selectedValue={categoria}
+                            onValueChange={itemValue =>
+                                setCategoria(itemValue)
+                            }>
+                            <Picker.Item
+                                label="Seleccione..."
+                                value=""
+                                color="grey"
+                                enabled={false}
+                            />
+                            <Picker.Item label="Ahorro" value="ahorro" />
+                            <Picker.Item label="Comida" value="comida" />
+                            <Picker.Item label="Casa" value="casa" />
+                            <Picker.Item label="Gastos varios" value="gastos" />
+                            <Picker.Item label="Ocio" value="ocio" />
+                            <Picker.Item label="Salud" value="salud" />
+                            <Picker.Item
+                                label="Suscripciones"
+                                value="suscripciones"
+                            />
+                        </Picker>
+                    </View>
                 </View>
 
-                <Pressable
+                <TouchableOpacity
                     style={styles.submitBtn}
-                    onPress={() => handleGasto({nombre, cantidad, categoria})}>
-                    <Text style={styles.submitBtnTexto}>Agregar Gasto</Text>
-                </Pressable>
+                    onPress={() =>
+                        handleGasto({nombre, cantidad, categoria, id, fecha})
+                    }>
+                    <Text style={styles.submitBtnTexto}>
+                        {gasto?.id ? 'Guardar cambios' : 'Agregar gasto'}
+                    </Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -91,14 +133,24 @@ const styles = StyleSheet.create({
         backgroundColor: '#1E40AF',
         flex: 1,
     },
-    btnCancelar: {
-        backgroundColor: '#DB2777',
+    contenedorBotones: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    btn: {
+        flexGrow: 1,
         borderRadius: 10,
         padding: 10,
         marginTop: 30,
         marginHorizontal: 10,
     },
-    btnCancelarTexto: {
+    btnCancelar: {
+        backgroundColor: '#DB2777',
+    },
+    btnEliminar: {
+        backgroundColor: '#EF4444',
+    },
+    btnTexto: {
         textAlign: 'center',
         textTransform: 'uppercase',
         fontWeight: 'bold',
@@ -124,6 +176,7 @@ const styles = StyleSheet.create({
     },
     input: {
         backgroundColor: '#F5F5F5',
+        color: '#000',
         padding: 10,
         borderRadius: 10,
         marginTop: 10,
